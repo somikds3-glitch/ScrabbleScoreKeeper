@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Scrabble Score Master - Created by Somik</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background: #f4f4f4;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      color: #333;
+    }
+    table {
+      margin: 20px auto;
+      border-collapse: collapse;
+      width: 80%;
+      background: #fff;
+    }
+    table, th, td {
+      border: 1px solid #444;
+    }
+    th, td {
+      padding: 10px;
+      text-align: center;
+    }
+    th {
+      background: #eee;
+    }
+    button {
+      padding: 10px 20px;
+      margin: 10px;
+      font-size: 16px;
+      cursor: pointer;
+      border: none;
+      border-radius: 5px;
+    }
+    #startBtn {
+      background-color: #4CAF50;
+      color: white;
+    }
+    #roundBtn {
+      background-color: #2196F3;
+      color: white;
+    }
+    #endBtn {
+      background-color: #f44336;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <h1>Scrabble Score Master</h1>
+  <h3>Created by Somik</h3>
+
+  <button id="startBtn">Start Game</button>
+  <button id="roundBtn" style="display:none;">Next Round</button>
+  <button id="endBtn" style="display:none;">End Game</button>
+
+  <div id="scoreboard"></div>
+
+  <script>
+    let players = [];
+    let scores = [];
+
+    document.getElementById("startBtn").onclick = function() {
+      let numPlayers = prompt("Enter number of players:");
+      if (!numPlayers || isNaN(numPlayers) || numPlayers <= 0) {
+        alert("Please enter a valid number.");
+        return;
+      }
+      numPlayers = parseInt(numPlayers);
+      players = [];
+      scores = new Array(numPlayers).fill(0);
+
+      for (let i = 0; i < numPlayers; i++) {
+        let name = prompt("Enter name for Player " + (i+1) + ":");
+        if (!name) name = "Player " + (i+1);
+        players.push(name);
+      }
+
+      renderTable();
+      document.getElementById("roundBtn").style.display = "inline-block";
+      document.getElementById("endBtn").style.display = "inline-block";
+    };
+
+    document.getElementById("roundBtn").onclick = function() {
+      for (let i = 0; i < players.length; i++) {
+        let scoreInput = prompt("Enter score for " + players[i] + ":");
+        let score = parseInt(scoreInput);
+        if (!isNaN(score)) {
+          scores[i] += score;
+        }
+      }
+      renderTable();
+    };
+
+    document.getElementById("endBtn").onclick = function() {
+      alert("Game Over! Final Scores:\n" + players.map((p, i) => p + ": " + scores[i]).join("\n"));
+      location.reload(); // restart game
+    };
+
+    function renderTable() {
+      let html = "<table><tr><th>Player</th><th>Total Score</th></tr>";
+      for (let i = 0; i < players.length; i++) {
+        html += "<tr><td>" + players[i] + "</td><td>" + scores[i] + "</td></tr>";
+      }
+      html += "</table>";
+      document.getElementById("scoreboard").innerHTML = html;
+    }
+  </script>
+</body>
+</html>
