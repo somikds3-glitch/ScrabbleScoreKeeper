@@ -81,7 +81,7 @@
   <h3>Created by Somik</h3>
 
   <button class="btn" id="startBtn">Start Game</button>
-  <button class="btn" id="roundBtn">Next Round</button>
+  <button class="btn" id="roundBtn">Play the First Round</button>
   <button class="btn" id="endBtn">End Game</button>
 
   <div id="orderSetup"></div>
@@ -143,6 +143,7 @@
       document.getElementById("startBtn").style.display = "none";
       document.getElementById("roundBtn").style.display = "inline-block";
       document.getElementById("endBtn").style.display = "inline-block";
+      document.getElementById("roundBtn").innerText = "Play the First Round";
     };
 
     document.getElementById("roundBtn").onclick = function() {
@@ -158,6 +159,12 @@
         }
       }
       roundHistory.push(roundScores);
+
+      // Update button text after first round
+      if (roundHistory.length === 1) {
+        document.getElementById("roundBtn").innerText = "Play the Next Round";
+      }
+
       renderTable();
     };
 
