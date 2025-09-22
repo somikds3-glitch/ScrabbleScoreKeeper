@@ -23,7 +23,7 @@
       color: #ddd;
     }
     .btn {
-      padding: 10px 20px;
+      padding: 12px 24px;
       margin: 10px;
       font-size: 16px;
       cursor: pointer;
@@ -34,7 +34,7 @@
     #startBtn { background-color: #4CAF50; color: white; }
     #roundBtn { background-color: #2196F3; color: white; display:none; }
     #endBtn   { background-color: #f44336; color: white; display:none; }
-    .btn:hover { opacity: 0.85; }
+    .btn:hover { transform: scale(1.05); }
 
     table {
       margin: 30px auto;
@@ -65,13 +65,14 @@
       color: #333;
       border-radius: 10px;
       padding: 20px;
-      width: 300px;
+      width: 320px;
       margin: 20px auto;
       box-shadow: 0 4px 12px rgba(0,0,0,0.4);
     }
     select {
-      padding: 5px;
+      padding: 6px;
       margin: 5px;
+      width: 80%;
     }
   </style>
 </head>
@@ -137,6 +138,9 @@
       order = chosen;
       document.getElementById("orderSetup").innerHTML = "";
       renderTable();
+
+      // Hide Start button, show round/end buttons
+      document.getElementById("startBtn").style.display = "none";
       document.getElementById("roundBtn").style.display = "inline-block";
       document.getElementById("endBtn").style.display = "inline-block";
     };
