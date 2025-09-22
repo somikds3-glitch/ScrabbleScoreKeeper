@@ -74,6 +74,33 @@
       margin: 5px;
       width: 80%;
     }
+
+    #finalResults {
+      margin-top: 30px;
+      padding: 20px;
+      background: #fff;
+      color: #333;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+      width: 400px;
+      margin-left: auto;
+      margin-right: auto;
+      display: none;
+    }
+    .winner {
+      font-size: 1.6em;
+      font-weight: bold;
+      color: #2a5298;
+      animation: popIn 1.2s ease forwards;
+    }
+    .others {
+      margin-top: 15px;
+      text-align: left;
+    }
+    @keyframes popIn {
+      0% { opacity: 0; transform: scale(0.5); }
+      100% { opacity: 1; transform: scale(1); }
+    }
   </style>
 </head>
 <body>
@@ -86,6 +113,7 @@
 
   <div id="orderSetup"></div>
   <div id="scoreboard"></div>
+  <div id="finalResults"></div>
 
   <script>
     let players = [];
@@ -139,7 +167,6 @@
       document.getElementById("orderSetup").innerHTML = "";
       renderTable();
 
-      // Hide Start button, show round/end buttons
       document.getElementById("startBtn").style.display = "none";
       document.getElementById("roundBtn").style.display = "inline-block";
       document.getElementById("endBtn").style.display = "inline-block";
@@ -160,7 +187,6 @@
       }
       roundHistory.push(roundScores);
 
-      // Update button text after first round
       if (roundHistory.length === 1) {
         document.getElementById("roundBtn").innerText = "Play the Next Round";
       }
@@ -169,8 +195,27 @@
     };
 
     document.getElementById("endBtn").onclick = function() {
-      alert("Game Over! Final Scores:\n" + players.map((p, i) => p + ": " + scores[i]).join("\n"));
-      location.reload();
+      // Sort scores in descending order
+      let finalRanking = players.map((p, i) => ({ name: p, score: scores[i] }))
+                                .sort((a, b) => b.score - a.score);
+
+      let winner = finalRanking[0];
+      let others = finalRanking.slice(1);
+
+      let resultsHTML = `<div class="winner">🏆 Winner: ${winner.name} (${winner.score} points)</div>`;
+      if (others.length > 0) {
+        resultsHTML += '<div class="others"><h4>Other Players:</h4><ul>';
+        others.forEach(p => {
+          resultsHTML += `<li>${p.name}: ${p.score} points</li>`;
+        });
+        resultsHTML += '</ul></div>';
+      }
+
+      document.getElementById("finalResults").innerHTML = resultsHTML;
+      document.getElementById("finalResults").style.display = "block";
+
+      document.getElementById("roundBtn").style.display = "none";
+      document.getElementById("endBtn").style.display = "none";
     };
 
     function renderTable() {
