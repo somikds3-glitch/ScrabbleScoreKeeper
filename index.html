@@ -5,50 +5,73 @@
   <title>Scrabble Score Master - Created by Somik</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #1e3c72, #2a5298);
+      color: #f0f0f0;
       text-align: center;
-      background: #f4f4f4;
       margin: 0;
       padding: 20px;
     }
     h1 {
-      color: #333;
+      margin-top: 0;
+      font-size: 2.5em;
+      letter-spacing: 1px;
     }
-    table {
-      margin: 20px auto;
-      border-collapse: collapse;
-      width: 80%;
-      background: #fff;
+    h3 {
+      margin-top: -10px;
+      font-weight: normal;
+      color: #ddd;
     }
-    table, th, td {
-      border: 1px solid #444;
-    }
-    th, td {
-      padding: 10px;
-      text-align: center;
-    }
-    th {
-      background: #eee;
-    }
-    button {
+    .btn {
       padding: 10px 20px;
       margin: 10px;
       font-size: 16px;
       cursor: pointer;
       border: none;
-      border-radius: 5px;
+      border-radius: 8px;
+      transition: 0.3s;
     }
-    #startBtn {
-      background-color: #4CAF50;
+    #startBtn { background-color: #4CAF50; color: white; }
+    #roundBtn { background-color: #2196F3; color: white; display:none; }
+    #endBtn   { background-color: #f44336; color: white; display:none; }
+    .btn:hover { opacity: 0.85; }
+
+    table {
+      margin: 30px auto;
+      border-collapse: collapse;
+      width: 85%;
+      background: #fff;
+      color: #333;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    }
+    table th, table td {
+      padding: 12px;
+      border-bottom: 1px solid #ddd;
+      text-align: center;
+    }
+    table th {
+      background-color: #2a5298;
       color: white;
     }
-    #roundBtn {
-      background-color: #2196F3;
-      color: white;
+    table tr:last-child td {
+      font-weight: bold;
+      background: #f4f4f4;
     }
-    #endBtn {
-      background-color: #f44336;
-      color: white;
+
+    .player-order {
+      background: #fff;
+      color: #333;
+      border-radius: 10px;
+      padding: 20px;
+      width: 300px;
+      margin: 20px auto;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    }
+    select {
+      padding: 5px;
+      margin: 5px;
     }
   </style>
 </head>
@@ -56,15 +79,18 @@
   <h1>Scrabble Score Master</h1>
   <h3>Created by Somik</h3>
 
-  <button id="startBtn">Start Game</button>
-  <button id="roundBtn" style="display:none;">Next Round</button>
-  <button id="endBtn" style="display:none;">End Game</button>
+  <button class="btn" id="startBtn">Start Game</button>
+  <button class="btn" id="roundBtn">Next Round</button>
+  <button class="btn" id="endBtn">End Game</button>
 
+  <div id="orderSetup"></div>
   <div id="scoreboard"></div>
 
   <script>
     let players = [];
+    let order = [];
     let scores = [];
+    let roundHistory = [];
 
     document.getElementById("startBtn").onclick = function() {
       let numPlayers = prompt("Enter number of players:");
@@ -75,6 +101,7 @@
       numPlayers = parseInt(numPlayers);
       players = [];
       scores = new Array(numPlayers).fill(0);
+      roundHistory = [];
 
       for (let i = 0; i < numPlayers; i++) {
         let name = prompt("Enter name for Player " + (i+1) + ":");
@@ -82,33 +109,76 @@
         players.push(name);
       }
 
+      renderOrderSetup();
+    };
+
+    function renderOrderSetup() {
+      let html = '<div class="player-order"><h3>Set Player Order</h3>';
+      for (let i = 0; i < players.length; i++) {
+        html += `<label>Position ${i+1}: 
+                   <select id="order${i}">` +
+                   players.map(p => `<option value="${p}">${p}</option>`).join("") +
+                 `</select><br>`;
+      }
+      html += '<button class="btn" style="background:#673ab7;color:white;" onclick="confirmOrder()">Confirm Order</button></div>';
+      document.getElementById("orderSetup").innerHTML = html;
+    }
+
+    window.confirmOrder = function() {
+      let chosen = [];
+      for (let i = 0; i < players.length; i++) {
+        let val = document.getElementById("order"+i).value;
+        if (chosen.includes(val)) {
+          alert("Each player must appear only once!");
+          return;
+        }
+        chosen.push(val);
+      }
+      order = chosen;
+      document.getElementById("orderSetup").innerHTML = "";
       renderTable();
       document.getElementById("roundBtn").style.display = "inline-block";
       document.getElementById("endBtn").style.display = "inline-block";
     };
 
     document.getElementById("roundBtn").onclick = function() {
-      for (let i = 0; i < players.length; i++) {
-        let scoreInput = prompt("Enter score for " + players[i] + ":");
+      let roundScores = [];
+      for (let i = 0; i < order.length; i++) {
+        let scoreInput = prompt("Enter score for " + order[i] + ":");
         let score = parseInt(scoreInput);
         if (!isNaN(score)) {
-          scores[i] += score;
+          scores[players.indexOf(order[i])] += score;
+          roundScores.push(score);
+        } else {
+          roundScores.push(0);
         }
       }
+      roundHistory.push(roundScores);
       renderTable();
     };
 
     document.getElementById("endBtn").onclick = function() {
       alert("Game Over! Final Scores:\n" + players.map((p, i) => p + ": " + scores[i]).join("\n"));
-      location.reload(); // restart game
+      location.reload();
     };
 
     function renderTable() {
-      let html = "<table><tr><th>Player</th><th>Total Score</th></tr>";
-      for (let i = 0; i < players.length; i++) {
-        html += "<tr><td>" + players[i] + "</td><td>" + scores[i] + "</td></tr>";
+      let html = "<table><tr><th>Round</th>";
+      players.forEach(p => { html += `<th>${p}</th>`; });
+      html += "</tr>";
+
+      for (let r = 0; r < roundHistory.length; r++) {
+        html += `<tr><td>${r+1}</td>`;
+        for (let i = 0; i < players.length; i++) {
+          html += `<td>${roundHistory[r][order.indexOf(players[i])] || 0}</td>`;
+        }
+        html += "</tr>";
       }
-      html += "</table>";
+
+      html += "<tr><td>Total</td>";
+      scores.forEach(s => { html += `<td>${s}</td>`; });
+      html += "</tr></table>";
+
       document.getElementById("scoreboard").innerHTML = html;
     }
   </script>
